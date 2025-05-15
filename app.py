@@ -98,7 +98,7 @@ app = Flask(__name__)
 # 🔹 모델 및 클래스 로드
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-model_path = os.path.join(BASE_DIR, 'model', 'oxford_flower_model.keras')
+model_path = os.path.join(BASE_DIR, 'models', 'oxford_flower_model.keras')
 model = tf.keras.models.load_model(model_path)
 
 json_path = os.path.join(BASE_DIR, 'cat_to_name.json')
