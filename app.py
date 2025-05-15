@@ -15,6 +15,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(BASE_DIR, 'models', 'oxford_flower_light.keras')
 model = tf.keras.models.load_model(model_path)
 
+# ✅ Render cold start crash 방지용 warm-up
+_ = model.predict(np.zeros((1, 224, 224, 3)))
+
 # 🔹 클래스 이름 로딩
 json_path = os.path.join(BASE_DIR, 'cat_to_name.json')
 with open(json_path, 'r') as f:
@@ -31,7 +34,7 @@ def process_image(image: np.ndarray) -> np.ndarray:
 # 🔹 홈 페이지 라우팅
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index_webapp.html')  # 또는 index_local.html 등
+    return render_template('index_webapp.html')
 
 # 🔹 예측 라우트
 @app.route('/predict', methods=['POST'])
@@ -56,18 +59,17 @@ def predict():
     processed_image = np.expand_dims(processed_image, 0)
 
     # 🔹 예측 수행
-    predictions = model.predict(processed_image)
-    top_k_index = np.argsort(predictions[0])[-1:]
-    print('top_k_index: ', top_k_index)
-
-    # 🔹 예측 결과 해석
     try:
+        predictions = model.predict(processed_image)
+        top_k_index = np.argsort(predictions[0])[-1:]
+        print('top_k_index: ', top_k_index)
+
         classes_names_list = [class_names[str(index + 1)] for index in top_k_index]
         predicted_flower = classes_names_list[0]
         predicted_probability = predictions[0][top_k_index[0]]
-    except IndexError as e:
-        app.logger.error(f'IndexError: {e} - Predicted index out of range.')
-        return jsonify({'error': 'Predicted index is out of range'}), 500
+    except Exception as e:
+        app.logger.error(f'[PREDICT ERROR] {e}')
+        return jsonify({'error': str(e)}), 500
 
     return render_template(
         'index_webapp.html',
