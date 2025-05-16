@@ -18,7 +18,7 @@ model_path = os.path.join(BASE_DIR, 'models', 'oxford_flower_tiny.keras')
 model = tf.keras.models.load_model(model_path)
 
 # ✅ Render cold start crash 방지용 warm-up
-_ = model.predict(np.zeros((1, 224, 224, 3)))
+# _ = model.predict(np.zeros((1, 224, 224, 3)))
 
 # 🔹 클래스 이름 로딩
 json_path = os.path.join(BASE_DIR, 'cat_to_name.json')
