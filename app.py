@@ -4,6 +4,8 @@ import numpy as np
 import os
 from PIL import Image
 import json
+import time
+
 
 # 🔹 Flask 앱 초기화
 app = Flask(__name__)
@@ -60,7 +62,11 @@ def predict():
 
     # 🔹 예측 수행
     try:
+        start = time.time()  # 🔻 예측 시작 시간
         predictions = model.predict(processed_image)
+        end = time.time()    # 🔻 예측 끝 시간
+        print(f"[PREDICT TIME] {end - start:.2f} sec")  # ⏱️ 시간 출력
+
         top_k_index = np.argsort(predictions[0])[-1:]
         print('top_k_index: ', top_k_index)
 
@@ -77,6 +83,7 @@ def predict():
         predicted_probability="{:.1%}".format(predicted_probability),
         image_path=os.path.join('static', filename)
     )
+
 
 # 🔹 앱 실행
 if __name__ == '__main__':
